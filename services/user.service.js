@@ -1,4 +1,5 @@
 const boom = require('@hapi/boom');
+const bcrypt = require('bcrypt');
 
 const { models } = require('./../libs/sequelize');
 
@@ -6,7 +7,14 @@ class UserService {
   constructor() {}
 
   async create(data) {
-    const newUser = await models.User.create(data);
+    const hash = await bcrypt.hash(data.password, 10);
+    const newUser = await models.User.create({
+      // Se clona todo el objeto
+      ...data,
+      password: hash
+    });
+    // Serializando con sequelize de debe añadir dataValues
+    delete newUser.dataValues.password;
     return newUser;
   }
 
