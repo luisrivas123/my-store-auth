@@ -9,11 +9,9 @@ class UserService {
   async create(data) {
     const hash = await bcrypt.hash(data.password, 10);
     const newUser = await models.User.create({
-      // Se clona todo el objeto
       ...data,
       password: hash
     });
-    // Serializando con sequelize de debe añadir dataValues
     delete newUser.dataValues.password;
     return newUser;
   }
@@ -21,6 +19,13 @@ class UserService {
   async find() {
     const rta = await models.User.findAll({
       include: ['customer']
+    });
+    return rta;
+  }
+
+  async findByEmail(email) {
+    const rta = await models.User.findOne({
+      where: { email }
     });
     return rta;
   }
