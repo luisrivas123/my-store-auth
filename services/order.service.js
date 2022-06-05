@@ -8,13 +8,45 @@ class OrderService {
   }
 
   async create(data) {
-    const newOrder = await models.Order.create(data);
+    // const newOrder = await models.Order.create(data);
+    // return newOrder;
+    // Accedemos al modelo Customer y usando where encadenamos hacia user
+    const customer = await models.Customer.findAll({
+      where: {
+        '$user.id$': data.userId
+      },
+      include: ['user']
+    });
+    // Validamos que exista el customer
+    if (!customer) {
+      throw boom.notFound('Customer not found');
+    }
+    // Creamos un objeto con el customerId obtenido de la consulta
+    const dataOrder = {
+      customerId: customer[0].id
+    };
+    const newOrder = await models.Order.create(dataOrder);
     return newOrder;
   }
 
   async addItem(data) {
     const newItem = await models.OrderProduct.create(data);
     return newItem;
+  }
+
+  async findByUser(userId) {
+    const orders = await models.Order.findAll({
+      where: {
+        '$customer.user.id$': userId
+      },
+      include: [
+        {
+          association: 'customer',
+          include: ['user']
+        }
+      ]
+    });
+    return orders;
   }
 
   async find() {
