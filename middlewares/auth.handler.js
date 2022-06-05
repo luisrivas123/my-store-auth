@@ -10,5 +10,27 @@ function checkApiKey(req, res, next) {
     next(boom.unauthorized());
   }
 }
+function checkAdminRole(req, res, next) {
+  const user = req.user;
+  if (user.role === 'admin') {
+    next();
+  } else {
+    next(boom.unauthorized());
+  }
+}
 
-module.exports = { checkApiKey }
+function checkRoles(...roles) {
+  return (req, res, next) => {
+    const user = req.user;
+    if (roles.includes(user.role)) {
+      next();
+    } else {
+      next(boom.unauthorized());
+      // next(boom.forbidden('se requieren permisos de administrador'));
+    }
+  }
+}
+
+
+
+module.exports = { checkApiKey, checkAdminRole, checkRoles }
