@@ -36,7 +36,12 @@ module.exports = {
         type: Sequelize.DataTypes.DATE,
         field: 'create_at',
         defaultValue: Sequelize.NOW
-      }
+      },
+      recoveryToken: {
+        field: 'recovery_token',
+        allowNull: true,
+        type: Sequelize.DataTypes.STRING
+      },
     });
     await queryInterface.createTable(CUSTOMER_TABLE, {
       id: {
